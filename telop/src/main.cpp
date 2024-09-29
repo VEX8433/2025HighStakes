@@ -78,18 +78,21 @@ void autonomous() {}
 
 void opcontrol() {
 	pros::Controller master(pros::E_CONTROLLER_MASTER);
-	pros::Motor LEFT_MIDDLE(-17, pros::v5::MotorGears::blue);//
-	pros::Motor LEFT_FRONT(-14, pros::v5::MotorGears::blue);//
-	pros::Motor LEFT_BACK(-15, pros::v5::MotorGears::blue);//
-	pros::Motor RIGHT_MIDDLE(20, pros::v5::MotorGears::blue);//
-	pros::Motor RIGHT_FRONT(19, pros::v5::MotorGears::blue);//
-	pros::Motor RIGHT_BACK(13, pros::v5::MotorGears::blue);//
+	pros::Motor LEFT_MIDDLE(-11, pros::v5::MotorGears::blue);//
+	pros::Motor LEFT_FRONT(-10, pros::v5::MotorGears::blue);//
+	pros::Motor LEFT_BACK(-5, pros::v5::MotorGears::blue);//
+	pros::Motor RIGHT_MIDDLE(8, pros::v5::MotorGears::blue);//
+	pros::Motor RIGHT_FRONT(7, pros::v5::MotorGears::blue);//
+	pros::Motor RIGHT_BACK(6, pros::v5::MotorGears::blue);//
 	
-	pros::Motor intakeLeft(5, pros::v5::MotorGears::blue);
-	pros::Motor intakeRight(-2, pros::v5::MotorGears::blue);
+	pros::Motor intakeLeft(4, pros::v5::MotorGears::green);
+	pros::Motor intakeRight(-2, pros::v5::MotorGears::green);
+	pros::Motor armLeft(9, pros::v5::MotorGears::green);
+	pros::Motor armRight(-3, pros::v5::MotorGears::green);
 
 
 	pros::adi::DigitalOut hang('A');
+	pros::adi::DigitalOut claw('D');
 	
 	LEFT_MIDDLE.set_brake_mode(pros::E_MOTOR_BRAKE_BRAKE);
 	LEFT_FRONT.set_brake_mode(pros::E_MOTOR_BRAKE_BRAKE);
@@ -98,26 +101,52 @@ void opcontrol() {
 	RIGHT_FRONT.set_brake_mode(pros::E_MOTOR_BRAKE_BRAKE);
 	RIGHT_BACK.set_brake_mode(pros::E_MOTOR_BRAKE_BRAKE);
 
+	armLeft.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
+	armRight.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
+
 	bool hangToggle = false;
+	bool clawToggle = false;
 
 	while (true) {
 
-		if(master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_L2)){
+		if(master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_X)){
 			hangToggle = !hangToggle;
 			hang.set_value(hangToggle);
 		}
 
-		if(master.get_digital(pros::E_CONTROLLER_DIGITAL_R1)){
-			intakeLeft.move_velocity(600);
-			intakeRight.move_velocity(600);
+		if(master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_B)){
+			clawToggle = !clawToggle;
+			claw.set_value(clawToggle);
+		}
+
+		if(master.get_digital(pros::E_CONTROLLER_DIGITAL_R1) &&master.get_digital(pros::E_CONTROLLER_DIGITAL_R2)){
+			intakeLeft.move_velocity(-200);
+			intakeRight.move_velocity(-200);
+		}
+		else if(master.get_digital(pros::E_CONTROLLER_DIGITAL_R1)){
+			intakeLeft.move_velocity(200);
+			intakeRight.move_velocity(200);
 		}
 		else if(master.get_digital(pros::E_CONTROLLER_DIGITAL_R2)){
-			intakeLeft.move_velocity(-600);
-			intakeRight.move_velocity(-600);
+			intakeLeft.move_velocity(0);
+			intakeRight.move_velocity(200);
 		}
 		else{
 			intakeLeft.move_velocity(0);
 			intakeRight.move_velocity(0);
+		}
+
+		if(master.get_digital(pros::E_CONTROLLER_DIGITAL_L1)){
+			armLeft.move_velocity(200);
+			armRight.move_velocity(200);
+		}
+		else if(master.get_digital(pros::E_CONTROLLER_DIGITAL_L2)){
+			armLeft.move_velocity(-70);
+			armRight.move_velocity(-70);
+		}
+		else{
+			armLeft.move_velocity(0);
+			armRight.move_velocity(0);
 		}
 
 		// LeftMotor.spin((Controller1.Axis3.value() + Controller1.Axis1.value()*2));
