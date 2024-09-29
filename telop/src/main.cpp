@@ -93,7 +93,7 @@ void opcontrol() {
 
 	pros::adi::DigitalOut hang('A');
 	pros::adi::DigitalOut claw('D');
-	
+	pros::Motor left(3);
 	LEFT_MIDDLE.set_brake_mode(pros::E_MOTOR_BRAKE_BRAKE);
 	LEFT_FRONT.set_brake_mode(pros::E_MOTOR_BRAKE_BRAKE);
 	LEFT_BACK.set_brake_mode(pros::E_MOTOR_BRAKE_BRAKE);
