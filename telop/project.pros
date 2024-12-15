@@ -222,7 +222,8 @@
     },
     "upload_options": {
       "icon": "pizza",
-      "description": "My PROS Project"
+      "description": "My PROS Project",
+      "slot": 3
     }
   }
 }

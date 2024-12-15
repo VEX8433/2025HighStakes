@@ -78,22 +78,23 @@ void autonomous() {}
 
 void opcontrol() {
 	pros::Controller master(pros::E_CONTROLLER_MASTER);
-	pros::Motor LEFT_MIDDLE(-11, pros::v5::MotorGears::blue);//
-	pros::Motor LEFT_FRONT(-10, pros::v5::MotorGears::blue);//
-	pros::Motor LEFT_BACK(-5, pros::v5::MotorGears::blue);//
-	pros::Motor RIGHT_MIDDLE(8, pros::v5::MotorGears::blue);//
-	pros::Motor RIGHT_FRONT(7, pros::v5::MotorGears::blue);//
-	pros::Motor RIGHT_BACK(6, pros::v5::MotorGears::blue);//
+	pros::Motor LEFT_MIDDLE(-7, pros::v5::MotorGears::blue);
+	pros::Motor LEFT_FRONT(-5, pros::v5::MotorGears::blue);
+	pros::Motor LEFT_BACK(-4, pros::v5::MotorGears::blue);
+	pros::Motor RIGHT_MIDDLE(12, pros::v5::MotorGears::blue);
+	pros::Motor RIGHT_FRONT(6, pros::v5::MotorGears::blue);
+	pros::Motor RIGHT_BACK(8, pros::v5::MotorGears::blue);
 	
-	pros::Motor intakeLeft(4, pros::v5::MotorGears::green);
+	pros::Motor intakeLeft(10, pros::v5::MotorGears::green);
 	pros::Motor intakeRight(-2, pros::v5::MotorGears::green);
 	pros::Motor armLeft(9, pros::v5::MotorGears::green);
 	pros::Motor armRight(-3, pros::v5::MotorGears::green);
 
 
 	pros::adi::DigitalOut hang('A');
-	pros::adi::DigitalOut claw('D');
-	pros::Motor left(3);
+	pros::adi::DigitalOut claw('B');
+	pros::adi::DigitalOut doinker('C');
+
 	LEFT_MIDDLE.set_brake_mode(pros::E_MOTOR_BRAKE_BRAKE);
 	LEFT_FRONT.set_brake_mode(pros::E_MOTOR_BRAKE_BRAKE);
 	LEFT_BACK.set_brake_mode(pros::E_MOTOR_BRAKE_BRAKE);
@@ -106,6 +107,7 @@ void opcontrol() {
 
 	bool hangToggle = false;
 	bool clawToggle = false;
+	bool doinkerToggle = false;
 
 	while (true) {
 
@@ -117,6 +119,11 @@ void opcontrol() {
 		if(master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_B)){
 			clawToggle = !clawToggle;
 			claw.set_value(clawToggle);
+		}
+
+		if(master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_Y)){
+			doinkerToggle = !doinkerToggle;
+			doinker.set_value(doinkerToggle);
 		}
 
 		if(master.get_digital(pros::E_CONTROLLER_DIGITAL_R1) &&master.get_digital(pros::E_CONTROLLER_DIGITAL_R2)){
