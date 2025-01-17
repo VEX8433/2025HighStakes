@@ -4,6 +4,7 @@
 #include "pros/abstract_motor.hpp"
 #include "pros/motors.h"
 #include "pros/optical.hpp"
+#include "pros/screen.hpp"
 
 pros::Controller master(pros::E_CONTROLLER_MASTER);
 // pros::Motor LEFT_MIDDLE(-7, pros::v5::MotorGears::blue);
@@ -21,8 +22,8 @@ pros::Optical optical(14);
 lemlib::Drivetrain drivetrain(
 	&left_motors, // left motor group
 	&right_motors, // right motor group
-	11.3, // 10 inch track width
-	lemlib::Omniwheel::NEW_275, // using new 2.75" omnis
+	11.3, // track width
+	lemlib::Omniwheel::NEW_325, // using new 3.25" omnis
 	450, // drivetrain rpm is 450
 	2 // horizontal drift is 2 (for now)
 );

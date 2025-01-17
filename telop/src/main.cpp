@@ -1,7 +1,28 @@
 #include "main.h"
+#include "pros/llemu.hpp"
 #include "pros/misc.h"
 #include "pros/motors.h"
 #include "pros/rtos.h"
+#include "Subsystems/intake.hpp"
+
+pros::Motor LEFT_MIDDLE(-8, pros::v5::MotorGears::blue);
+pros::Motor LEFT_FRONT(-5, pros::v5::MotorGears::blue);
+pros::Motor LEFT_BACK(-10, pros::v5::MotorGears::blue);
+pros::Motor RIGHT_MIDDLE(3, pros::v5::MotorGears::blue);
+pros::Motor RIGHT_FRONT(14, pros::v5::MotorGears::blue);
+pros::Motor RIGHT_BACK(18, pros::v5::MotorGears::blue);
+
+pros::Motor bottom(-2, pros::v5::MotorGears::green);
+pros::Motor top(20, pros::v5::MotorGears::green);
+pros::v5::Optical optical(9);
+
+pros::Motor arm(19, pros::v5::MotorGears::green);
+pros::adi::DigitalOut doinker('C');
+pros::adi::DigitalOut intakeRaise('B');
+pros::adi::DigitalOut clamp('A');
+
+pros::v5::Rotation armRotation(1);
+
 /**
  * A callback function for LLEMU's center button.
  *
@@ -25,9 +46,7 @@ void on_center_button() {
  * to keep execution time for this mode under a few seconds.
  */
 void initialize() {
-	pros::lcd::initialize();
-
-	pros::lcd::register_btn1_cb(on_center_button);
+	pros::lcd::initialize(); // initialize brain screen
 }
 
 /**
@@ -75,25 +94,53 @@ void autonomous() {}
  * task, not resume it from where it left off.
  */
 
+pros::Controller master(pros::E_CONTROLLER_MASTER);
+
+void intaketelop(){
+	bool thing = false;
+    while(true){
+		if(master.get_digital(pros::E_CONTROLLER_DIGITAL_R1) && master.get_digital(pros::E_CONTROLLER_DIGITAL_R2)){
+			bottom.move_velocity(-200);
+			top.move_velocity(-200);
+		}
+		else if(master.get_digital(pros::E_CONTROLLER_DIGITAL_R1)){
+			bottom.move_velocity(200);
+			top.move_velocity(200);
+			
+			// if(optical.get_hue() < 240 && optical.get_hue() > 200){
+			// 	pros::delay(70);
+			// 	top.move_velocity(0);
+			// 	pros::delay(150);
+			// 	top.move_velocity(600);
+			// }
+
+			pros::delay(150);
+
+			if(top.get_actual_velocity() < 20){
+				top.move_velocity(-200);
+				pros::delay(150);
+				top.move_velocity(200);
+			}
+		}
+		else if(master.get_digital(pros::E_CONTROLLER_DIGITAL_R2)){
+			top.move_velocity(0);
+			bottom.move_velocity(200);
+		} 
+		else{
+			top.move_velocity(0);
+			bottom.move_velocity(0);
+		}
+	}
+	pros::delay(20);
+}
 
 void opcontrol() {
-	pros::Controller master(pros::E_CONTROLLER_MASTER);
-	pros::Motor LEFT_MIDDLE(-7, pros::v5::MotorGears::blue);
-	pros::Motor LEFT_FRONT(-5, pros::v5::MotorGears::blue);
-	pros::Motor LEFT_BACK(-4, pros::v5::MotorGears::blue);
-	pros::Motor RIGHT_MIDDLE(12, pros::v5::MotorGears::blue);
-	pros::Motor RIGHT_FRONT(6, pros::v5::MotorGears::blue);
-	pros::Motor RIGHT_BACK(8, pros::v5::MotorGears::blue);
-	
-	pros::Motor intakeLeft(10, pros::v5::MotorGears::green);
-	pros::Motor intakeRight(-2, pros::v5::MotorGears::green);
-	pros::Motor armLeft(9, pros::v5::MotorGears::green);
-	pros::Motor armRight(-3, pros::v5::MotorGears::green);
+	optical.set_led_pwm(100);
+
+	arm.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
 
 
-	pros::adi::DigitalOut hang('A');
-	pros::adi::DigitalOut claw('B');
-	pros::adi::DigitalOut doinker('C');
+	armRotation.reset_position();
 
 	LEFT_MIDDLE.set_brake_mode(pros::E_MOTOR_BRAKE_BRAKE);
 	LEFT_FRONT.set_brake_mode(pros::E_MOTOR_BRAKE_BRAKE);
@@ -102,83 +149,68 @@ void opcontrol() {
 	RIGHT_FRONT.set_brake_mode(pros::E_MOTOR_BRAKE_BRAKE);
 	RIGHT_BACK.set_brake_mode(pros::E_MOTOR_BRAKE_BRAKE);
 
-	armLeft.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
-	armRight.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
-
-	bool hangToggle = false;
-	bool clawToggle = false;
+	bool intakeToggle = false;
+	bool clampToggle = false;
 	bool doinkerToggle = false;
+	bool armToggle = false;
+	bool intakeTopToggle = false;
+
+	pros::Task intakeTask(intaketelop);
 
 	while (true) {
 
+		if(master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_Y)){
+			armToggle = true;
+		}
+
+		if(armToggle && armRotation.get_position() < 4500){
+			arm.move_velocity(100);
+		}
+		else if(armToggle && armRotation.get_position() >= 4500){
+			armToggle = false;
+		}
+
 		if(master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_X)){
-			hangToggle = !hangToggle;
-			hang.set_value(hangToggle);
+			clampToggle = !clampToggle;
+			clamp.set_value(clampToggle);
 		}
 
 		if(master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_B)){
-			clawToggle = !clawToggle;
-			claw.set_value(clawToggle);
-		}
-
-		if(master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_Y)){
 			doinkerToggle = !doinkerToggle;
 			doinker.set_value(doinkerToggle);
 		}
 
-		if(master.get_digital(pros::E_CONTROLLER_DIGITAL_R1) &&master.get_digital(pros::E_CONTROLLER_DIGITAL_R2)){
-			intakeLeft.move_velocity(-200);
-			intakeRight.move_velocity(-200);
+		if(master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_UP)){
+			intakeToggle = !intakeToggle;
+			intakeRaise.set_value(intakeToggle);
 		}
-		else if(master.get_digital(pros::E_CONTROLLER_DIGITAL_R1)){
-			intakeLeft.move_velocity(200);
-			intakeRight.move_velocity(200);
-		}
-		else if(master.get_digital(pros::E_CONTROLLER_DIGITAL_R2)){
-			intakeLeft.move_velocity(0);
-			intakeRight.move_velocity(200);
-		}
-		else{
-			intakeLeft.move_velocity(0);
-			intakeRight.move_velocity(0);
-		}
+	
+		// intake.telOP(master.get_digital(pros::E_CONTROLLER_DIGITAL_R1), master.get_digital(pros::E_CONTROLLER_DIGITAL_R2));
 
 		if(master.get_digital(pros::E_CONTROLLER_DIGITAL_L1)){
-			armLeft.move_velocity(200);
-			armRight.move_velocity(200);
+			arm.move_velocity(200);
 		}
 		else if(master.get_digital(pros::E_CONTROLLER_DIGITAL_L2)){
-			armLeft.move_velocity(-70);
-			armRight.move_velocity(-70);
+			arm.move_velocity(-200);
 		}
-		else{
-			armLeft.move_velocity(0);
-			armRight.move_velocity(0);
+		else if(!armToggle){
+			arm.move_velocity(0);
 		}
 
 		// LeftMotor.spin((Controller1.Axis3.value() + Controller1.Axis1.value()*2));
 		// RightMotor.spin((Controller1.Axis3.value() - Controller1.Axis1.value()*2));
-		LEFT_MIDDLE.move_velocity((master.get_analog(pros::E_CONTROLLER_ANALOG_LEFT_Y) + master.get_analog(pros::E_CONTROLLER_ANALOG_RIGHT_X)) * 4.7244);
-		LEFT_FRONT.move_velocity((master.get_analog(pros::E_CONTROLLER_ANALOG_LEFT_Y) + master.get_analog(pros::E_CONTROLLER_ANALOG_RIGHT_X)) * 4.7244);
-		LEFT_BACK.move_velocity((master.get_analog(pros::E_CONTROLLER_ANALOG_LEFT_Y) + master.get_analog(pros::E_CONTROLLER_ANALOG_RIGHT_X)) * 4.7244);
-		RIGHT_MIDDLE.move_velocity((master.get_analog(pros::E_CONTROLLER_ANALOG_LEFT_Y) - master.get_analog(pros::E_CONTROLLER_ANALOG_RIGHT_X)) * 4.7244);
-		RIGHT_BACK.move_velocity((master.get_analog(pros::E_CONTROLLER_ANALOG_LEFT_Y) - master.get_analog(pros::E_CONTROLLER_ANALOG_RIGHT_X)) * 4.7244);
-		RIGHT_FRONT.move_velocity((master.get_analog(pros::E_CONTROLLER_ANALOG_LEFT_Y) - master.get_analog(pros::E_CONTROLLER_ANALOG_RIGHT_X)) * 4.7244);
 
-		std::string temp = std::to_string(23);
-		pros::lcd::set_text(0, "ROTATION: " + temp);
+		int LeftY = master.get_analog(pros::E_CONTROLLER_ANALOG_LEFT_Y);
+		int RightX = master.get_analog(pros::E_CONTROLLER_ANALOG_RIGHT_X);
 
-		temp = std::to_string(LEFT_FRONT.get_temperature());
-		pros::lcd::set_text(1, "LEFT_FRONT: " + temp);
-		temp = std::to_string(LEFT_BACK.get_temperature());
-		pros::lcd::set_text(2, "LEFT_BACK: " + temp);
-		// temp = std::to_string(RIGHT_MIDDLE.get_temperature());
-		pros::lcd::set_text(3, "RIGHT_MIDDLE: " + temp);
-		temp = std::to_string(RIGHT_BACK.get_temperature());
-		pros::lcd::set_text(4, "RIGHT_BACK: " + temp);
-		temp = std::to_string(RIGHT_FRONT.get_temperature());
-		pros::lcd::set_text(5, "RIGHT_FRONT: " + temp);
+		LEFT_MIDDLE.move_velocity((LeftY + RightX) * 4.7244);
+		LEFT_FRONT.move_velocity((LeftY + RightX) * 4.7244);
+		LEFT_BACK.move_velocity((LeftY + RightX) * 4.7244);
+		RIGHT_MIDDLE.move_velocity((LeftY - RightX) * 4.7244);
+		RIGHT_BACK.move_velocity((LeftY - RightX) * 4.7244);
+		RIGHT_FRONT.move_velocity((LeftY - RightX) * 4.7244);
 
+		pros::lcd::print(0, "%d", armRotation.get_position());
 		pros::delay(20);
 	}
 }
