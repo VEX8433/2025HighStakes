@@ -1106,32 +1106,32 @@ void ringSideRedElim(){
     arm.move_velocity(0);
     spinTop = true;
     spinBottom = true;
-    chassis.moveToPose(20, -47, 140, 2000, {.maxSpeed = 60, .minSpeed = 60}, false);
+    chassis.moveToPose(22, -49, 140, 2000, {.maxSpeed = 60, .minSpeed = 60}, false);
 
-    chassis.moveToPose(51, -48, 80, 2000, {.maxSpeed = 60, .minSpeed = 60}, false);
+    chassis.moveToPose(51, -51, 90, 2000, {.maxSpeed = 60, .minSpeed = 60}, false);
 
     chassis.moveToPoint(25, -45, 1500, {.forwards = false, .maxSpeed = 70, .minSpeed = 70}, false);
-    chassis.turnToHeading(70, 500);
+    chassis.turnToHeading(80, 500);
 
     chassis.moveToPoint(32, -35, 1500, {.maxSpeed = 70, .minSpeed = 70}, false);
 
     chassis.turnToHeading(0, 1000);
 
     chassis.moveToPose(40, -10, 45, 1000, {.maxSpeed = 100, .minSpeed = 100}, false);
-    chassis.moveToPoint(65, 15, 1500, {.maxSpeed = 50, .minSpeed = 50}, false);
+    chassis.moveToPoint(75, 10, 1200, {.maxSpeed = 50, .minSpeed = 50}, false);
 
-    chassis.moveToPoint(35, -20, 1500, {.forwards = false, .maxSpeed = 50, .minSpeed = 50}, false);
+    chassis.moveToPoint(35, -15, 1500, {.forwards = false, .maxSpeed = 50, .minSpeed = 50}, false);
 
     chassis.turnToHeading(-90, 1000);
 
-    chassis.moveToPoint(22, -22, 1500, {.maxSpeed = 80, .minSpeed = 80}, false);
+    chassis.moveToPoint(22, -20, 1500, {.maxSpeed = 80, .minSpeed = 80}, false);
     
     intakeRaise.set_value(true);
 
-    chassis.moveToPoint(5, -18, 2000, {.maxSpeed = 40, .minSpeed = 40}, false);
+    chassis.moveToPoint(4, -18, 2000, {.maxSpeed = 40, .minSpeed = 40}, false);
     intakeRaise.set_value(false);
-    chassis.moveToPoint(10, -20, 1000, {.forwards = false});
-    chassis.moveToPoint(7, -20, 1000);
+    chassis.moveToPoint(11, -20, 1000, {.forwards = false});
+    chassis.moveToPoint(5, -20, 1000);
 }
 
 
@@ -1195,11 +1195,11 @@ void soloAWPRed(){
     chassis.moveToPoint(-30, 40, 1500, {.maxSpeed = 70, .minSpeed = 50}, false);
     arm.move_velocity(0);
     chassis.turnToHeading(120, 500);
-    chassis.moveToPose(-5, 23, 90, 5000, {.maxSpeed = 70, .minSpeed = 50}, false);
+    chassis.moveToPose(-5, 25, 90, 5000, {.maxSpeed = 70, .minSpeed = 50}, false);
     clamp.set_value(false);
     spinTop = false;
     holdRing = true;
-    chassis.moveToPoint(35, 23, 3000, {.maxSpeed = 50, .minSpeed = 40});
+    chassis.moveToPoint(35, 25, 3000, {.maxSpeed = 50, .minSpeed = 40});
     chassis.turnToHeading(180, 1000);
 
     chassis.moveToPoint(38, 45, 1500, {.forwards = false, .maxSpeed = 70, .minSpeed = 50}, false);
@@ -1255,7 +1255,7 @@ void autonomous(){
     
     // chassis.moveToPose(-10, 60, -40, 5000);
     // chassis.turnToHeading(90, 10000);
-    // skills();
+    skills();
 
     // goalSideBlue();
     // ringSideBlue();
@@ -1264,7 +1264,7 @@ void autonomous(){
     // goalRushBlue();
     // soloAWPBlue();
  
-    goalSideRed();
+    // goalSideRed();
     // ringSideRed();
     // ringSideRedElim();
     // ringSideRedElim5Ring();
