@@ -880,12 +880,12 @@ void ringSideBlue(){
     pros::delay(200);
     chassis.turnToHeading(0, 1000);
     
-    chassis.moveToPoint(36, 53, 2000, {.maxSpeed = 60, .minSpeed = 50}, false);
+    chassis.moveToPoint(36, 51, 2000, {.maxSpeed = 60, .minSpeed = 50}, false);
     chassis.moveToPoint(25, 20, 2500, {.forwards = false, .maxSpeed = 60, .minSpeed = 50}, false);
-    chassis.moveToPoint(65, -20, 2000, {.maxSpeed = 50, .minSpeed = 40}, false);
+    chassis.moveToPoint(70, -10, 2000, {.maxSpeed = 50, .minSpeed = 40}, false);
     chassis.moveToPoint(8, 30, 2000, {.forwards = false, .maxSpeed = 60, .minSpeed = 50}, false);
     chassis.turnToHeading(-45, 1000);
-    chassis.moveToPose(4, 35,  -45, 500, {.minSpeed = 50});
+    chassis.moveToPose(-5, 40,  -45, 2000, {.minSpeed = 50}, false);
     arm.move_velocity(200);
     pros::delay(2000);
 }
@@ -1087,7 +1087,7 @@ void goalSideRed(){ // positive corner
     chassis.moveToPoint(70, -15, 2000, {.maxSpeed = 50, .minSpeed = 40}, false);
     chassis.moveToPoint(40, 10, 1000, {.forwards = false, .maxSpeed = 60, .minSpeed = 40}, false);
     chassis.turnToHeading(-45, 1000);
-    chassis.moveToPoint(15, 35, 2000, {.maxSpeed = 70}, false);
+    chassis.moveToPoint(11, 35, 2000, {.maxSpeed = 70}, false);
     arm.move_velocity(200);
     pros::delay(1000);
 }
@@ -1116,9 +1116,9 @@ void ringSideRed(){
     chassis.moveToPoint(-39, 47, 2000, {.maxSpeed = 60, .minSpeed = 50}, false);
     chassis.moveToPoint(-25, 20, 2500, {.forwards = false, .maxSpeed = 60, .minSpeed = 50}, false);
     chassis.moveToPoint(-65, -25, 2500, {.maxSpeed = 50, .minSpeed = 40}, false);
-    chassis.moveToPoint(-5, 33, 2000, {.forwards = false, .maxSpeed = 60, .minSpeed = 50}, false);
+    chassis.moveToPoint(-8 , 33, 2000, {.forwards = false, .maxSpeed = 60, .minSpeed = 50}, false);
     chassis.turnToHeading(35, 1000);
-    chassis.moveToPose(-4, 34,  45, 500, {.minSpeed = 50});
+    chassis.moveToPose(-6, 34,  45, 500, {.minSpeed = 50});
     arm.move_velocity(200);
     pros::delay(2000);
 }
@@ -1359,7 +1359,7 @@ void autonomous(){
     
     // chassis.moveToPose(-10, 60, -40, 5000);
     // chassis.turnToHeading(90, 10000);
-    skills();
+    // skills();
 
     // goalSideBlue();
     // ringSideBlue();
@@ -1373,6 +1373,6 @@ void autonomous(){
     // ringSideRedNoAlliance();
     // ringSideRedElim();
     // goalRushRed();
-    // goalSideRed();
+    goalSideRed();
     // soloAWPRed();
 }
