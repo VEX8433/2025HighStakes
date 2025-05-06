@@ -197,7 +197,7 @@ void intakeAuton(){
         else if(holdRing){
             bottom.move_velocity(200);
             top.move_velocity(200); 
-            pros::delay(120);
+            pros::delay(100);
 
             if (top.get_actual_velocity() < 20) {
                 top.move_velocity(-200);
@@ -227,19 +227,21 @@ void intakeAuton(){
             top.move_velocity(600);
             if(blue && optical.get_hue() > 0 && optical.get_hue() < 10 && optical.get_proximity() == 255){ // eject red
                 top.move_velocity(200);
-
                 ejector.set_value(true);
-                pros::delay(300);
-                top.move_velocity(0);
+                pros::delay(200);
+                top.move_velocity(-200);
+                pros::delay(200);
+                top.move_velocity(200);
                 pros::delay(200);
                 ejector.set_value(false);
             }
             else if(red && optical.get_hue() > 220 && optical.get_hue() < 230 && optical.get_proximity() == 255){// eject blue
                 top.move_velocity(200);
-
                 ejector.set_value(true);
-                pros::delay(300);
-                top.move_velocity(0);
+                pros::delay(200);
+                top.move_velocity(-200);
+                pros::delay(200);
+                top.move_velocity(200);
                 pros::delay(200);
                 ejector.set_value(false);
             }
@@ -280,6 +282,7 @@ void intakeAuton(){
 
 bool hold = false;
 bool score = false;
+bool rushHover = false;
 void armAuton(){
     while(auton){
         if(score){
@@ -306,11 +309,11 @@ void intakeTelop() {
     while (telop) {
         if(blue && optical.get_hue() > 0 && optical.get_hue() < 15 && optical.get_proximity() == 255){
             top.move_velocity(200);
-
             ejector.set_value(true);
-            pros::delay(260);
-            top.move_velocity(0);
             pros::delay(200);
+            top.move_velocity(-200);
+            pros::delay(200);
+            top.move_velocity(200);
             ejector.set_value(false);
         }
         else if(red && optical.get_hue() > 210 && optical.get_hue() < 240 && optical.get_proximity() == 255){// blue
@@ -408,8 +411,8 @@ void opcontrol() {
     telop = true;
     pros::Task armTelopControl(armTelop);
     pros::Task intakeTelopControl(intakeTelop);
-    // armRotation.set_position(target + 300); // for skills
-    // blue = true; ////////////////////////////////////////////////////////////////////////////////////////
+    armRotation.set_position(target + 300); // for skills
+    red = true; // for skills
 
     arm.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
     chassis.setBrakeMode(pros::E_MOTOR_BRAKE_BRAKE);
@@ -673,11 +676,12 @@ void skills(){
     hold = false;
     prime = true;
 
-    chassis.moveToPoint(-38, 65, 1500, {.forwards = false, .maxSpeed = 50, .minSpeed = 30}, false);
+    chassis.moveToPoint(-38, 64, 1500, {.forwards = false, .maxSpeed = 50, .minSpeed = 30}, false);
 
     chassis.turnToHeading(-90, 1000, {.maxSpeed = 50, .minSpeed = 30}, false);
-    chassis.moveToPoint(-70, 65, 1500, {.maxSpeed = 50, .minSpeed = 30}, false);
-    chassis.setPose(-64, 65, chassis.getPose().theta);
+    chassis.moveToPoint(-70, 64, 1500, {.maxSpeed = 50, .minSpeed = 30}, false);
+    chassis.cancelAllMotions();
+    chassis.setPose(-63, 65, chassis.getPose().theta);
     pros::delay(100);
     prime = false;
     scoreStop = true;
@@ -691,28 +695,26 @@ void skills(){
     score = false;
     hold = true;
     spinTop = true;
-    chassis.moveToPoint(-55, 65, 1500, {.forwards = false, .maxSpeed = 50, .minSpeed = 30}, false);
-
     chassis.turnToHeading(-180, 1000, {}, false);
-    chassis.moveToPoint(-55, -1, 2500, {.maxSpeed = 50}, false);
+    chassis.moveToPoint(-54, -1, 2500, {.maxSpeed = 50}, false);
     chassis.turnToHeading(-50, 1000);
     chassis.moveToPoint(-65, 15, 1000, {.minSpeed = 40}, false);
     chassis.turnToHeading(20, 1000);
-    chassis.moveToPoint(-75, -20, 700, {.forwards = false, .minSpeed = 40}, false);
+    chassis.moveToPoint(-80, -20, 700, {.forwards = false, .minSpeed = 40}, false);
 
     reverse = true;
     clamp.set_value(false);
     pros::delay(200);
 
 
-    chassis.setPose(-52, 10, chassis.getPose().theta); // remove 180
+    chassis.setPose(-50, 10, chassis.getPose().theta); // remove 180
     pros::delay(200);
-    chassis.moveToPoint(-26, 11, 1000, {.maxSpeed = 70, .minSpeed = 50});
+    chassis.moveToPoint(-26, 10, 1000, {.maxSpeed = 70, .minSpeed = 50});
     chassis.turnToHeading(-90, 1000, {.maxSpeed = 70, .minSpeed = 50});
 
-    chassis.moveToPoint(20, 11,1500, {.forwards = false, .maxSpeed = 70, .minSpeed = 50}, false);
+    chassis.moveToPoint(20, 10,1500, {.forwards = false, .maxSpeed = 70, .minSpeed = 50}, false);
 
-    chassis.moveToPoint(31, 11,1000, {.forwards = false, .maxSpeed = 50, .minSpeed = 30}, false);
+    chassis.moveToPoint(31, 10,1000, {.forwards = false, .maxSpeed = 50, .minSpeed = 30}, false);
     clamp.set_value(true);
     pros::delay(200);
     chassis.turnToHeading(0, 1000, {.maxSpeed = 70, .minSpeed = 50});
@@ -729,11 +731,13 @@ void skills(){
     hold = false;
     prime = true;
 
-    chassis.moveToPoint(50, 66, 1500, {.forwards = false, .maxSpeed = 50, .minSpeed = 30}, false);
+    chassis.moveToPoint(50, 65, 1500, {.forwards = false, .maxSpeed = 50, .minSpeed = 30}, false);
 
     chassis.turnToHeading(90, 1000, {}, false);
-    chassis.moveToPoint(70, 66, 2000, {.maxSpeed = 50}, false);
+    chassis.moveToPoint(70, 65, 2000, {.maxSpeed = 50}, false);
 
+    chassis.setPose(64, 65, chassis.getPose().theta);
+    
     prime = false;
     scoreStop = true;
     spinTop = false;
@@ -742,7 +746,7 @@ void skills(){
     pros::delay(1000);
     scoreStop = false;
 
-    chassis.moveToPoint(55, 66, 1500, {.forwards = false, .maxSpeed = 50, .minSpeed = 30}, false);
+    chassis.moveToPoint(55, 65, 1500, {.forwards = false, .maxSpeed = 50, .minSpeed = 30}, false);
     // chassis.moveToPoint(52, 68, 1000, {}, false);
     score = false;
     hold = true;
@@ -751,7 +755,7 @@ void skills(){
     // chassis.moveToPoint(45, 65, 500);
 
     chassis.turnToHeading(90, 1000, {}, false);
-    chassis.moveToPoint(53, -20, 2500, {.maxSpeed = 60, .minSpeed = 40}, false);
+    chassis.moveToPoint(54, -20, 2500, {.maxSpeed = 60, .minSpeed = 40}, false);
     chassis.turnToHeading(50, 1000);
     chassis.moveToPoint(70, 12, 1500, {.minSpeed = 40}, false);
     chassis.turnToHeading(-10, 1000);
@@ -775,7 +779,6 @@ void skills(){
 
     chassis.moveToPoint(38, 90, 1000);
     chassis.turnToHeading(90, 1000);
-    intakeRaise.set_value(true);
     chassis.moveToPoint(83, 100, 2500, {.maxSpeed = 60, .minSpeed = 50});
 
     chassis.moveToPoint(18, 81, 2000, {.forwards = false, .maxSpeed = 60, .minSpeed = 30}, false);
@@ -785,14 +788,11 @@ void skills(){
     spinTop = true;
     spinBottom = true;
 
-    intakeRaise.set_value(false);
-
     chassis.moveToPoint(80, 87, 3500, {.maxSpeed = 80, .minSpeed = 50}, false);
 
     chassis.moveToPose(40, 75, -40, 3000, {.forwards = false}, false);
 
     clamp.set_value(false);
-    intakeRaise.set_value(true);
 
     spinBottom = false;
     spinTop = false;
@@ -862,10 +862,9 @@ void goalSideBlue(){
 void ringSideBlue(){
     red = false;
     blue = true;
-    pros::delay(500);
 
     chassis.setPose(0, 5, 180);
-    chassis.turnToHeading(-140, 700, {}, false);
+    chassis.turnToHeading(-137, 700, {}, false);
     arm.move_velocity(200);
     pros::delay(700);
     arm.move_velocity(0);
@@ -881,12 +880,12 @@ void ringSideBlue(){
     pros::delay(200);
     chassis.turnToHeading(0, 1000);
     
-    chassis.moveToPoint(38, 48, 2000, {.maxSpeed = 60, .minSpeed = 50}, false);
+    chassis.moveToPoint(36, 53, 2000, {.maxSpeed = 60, .minSpeed = 50}, false);
     chassis.moveToPoint(25, 20, 2500, {.forwards = false, .maxSpeed = 60, .minSpeed = 50}, false);
     chassis.moveToPoint(65, -20, 2000, {.maxSpeed = 50, .minSpeed = 40}, false);
-    chassis.moveToPoint(5, 30, 2000, {.forwards = false, .maxSpeed = 60, .minSpeed = 50}, false);
+    chassis.moveToPoint(8, 30, 2000, {.forwards = false, .maxSpeed = 60, .minSpeed = 50}, false);
     chassis.turnToHeading(-45, 1000);
-    chassis.moveToPose(4, 32,  -45, 500, {.minSpeed = 50});
+    chassis.moveToPose(4, 35,  -45, 500, {.minSpeed = 50});
     arm.move_velocity(200);
     pros::delay(2000);
 }
@@ -980,6 +979,43 @@ void goalRushBlue(){
     chassis.turnToHeading(-90, 1000);
 }
 
+void goalRushBlueArm(){
+    red = false;
+    blue = true;
+
+    chassis.setPose(0, 0, 16.1); //changed to -20 to align with mogo (prev. -18)
+    spinBottom = true;
+    
+    score = true;
+    chassis.moveToPoint(8.25, 31.5, 1500,{.minSpeed = 127}, false); // rush forward
+
+    score = false;
+    arm.move_velocity(200);
+    pros::delay(200);
+ 
+    chassis.moveToPoint(10, 20, 5000, {.forwards = false, .minSpeed = 100}, false);
+    arm.move_velocity(-200);
+    pros::delay(200);
+
+    chassis.turnToHeading(-90, 1000);
+    chassis.moveToPoint(35, 25, 2000, {.forwards = false, .maxSpeed = 50, .minSpeed = 40}, false);
+    clamp.set_value(true);
+    spinTop = true;
+    pros::delay(200);
+    chassis.turnToHeading(-40, 1000);
+    chassis.moveToPoint(22, 34, 1000);
+    chassis.moveToPoint(25, 5, 1500, {.forwards = false}, false);
+    chassis.turnToHeading(-180, 1000, {}, false);
+    chassis.moveToPoint(-10, -15, 2000, {.maxSpeed = 60, .minSpeed = 60});
+    pros::delay(200);
+    doinker.set_value(true);
+    chassis.turnToHeading(0, 2000, {.minSpeed = 70}, false);
+    doinker.set_value(false);
+    chassis.moveToPoint(10, 15, 1000, {}, false);
+    chassis.turnToHeading(-60, 1000, {}, false);
+    spinTop = false;
+}
+
 void soloAWPBlue(){
     red = false;
     blue = true;
@@ -1023,7 +1059,7 @@ void goalSideRed(){ // positive corner
     red = true;
     blue = false;
     chassis.setPose(0, 0, 180);
-    chassis.turnToHeading(-140, 600);
+    chassis.turnToHeading(-137, 600);
 
     arm.move_velocity(200);
     pros::delay(800);
@@ -1051,7 +1087,7 @@ void goalSideRed(){ // positive corner
     chassis.moveToPoint(70, -15, 2000, {.maxSpeed = 50, .minSpeed = 40}, false);
     chassis.moveToPoint(40, 10, 1000, {.forwards = false, .maxSpeed = 60, .minSpeed = 40}, false);
     chassis.turnToHeading(-45, 1000);
-    chassis.moveToPoint(17, 35, 1500, {.maxSpeed = 70}, false);
+    chassis.moveToPoint(15, 35, 2000, {.maxSpeed = 70}, false);
     arm.move_velocity(200);
     pros::delay(1000);
 }
@@ -1061,10 +1097,41 @@ void ringSideRed(){
     blue = false;
 
     chassis.setPose(0, 0, 180);
-    chassis.turnToHeading(140, 700, {}, false);
+    chassis.turnToHeading(137, 700, {}, false);
     arm.move_velocity(200);
     pros::delay(700);
     arm.move_velocity(0);
+    chassis.moveToPose(-11, 45, -180, 1500, {.forwards = false, .maxSpeed = 70, .minSpeed = 50}, false);
+    clamp.set_value(true);
+    arm.move_velocity(-200);
+    pros::delay(200);
+    chassis.turnToHeading(-90, 1000);
+    spinBottom = true;
+    spinTop = true;
+    chassis.moveToPoint(-30, 38, 2500, {.maxSpeed = 90, .minSpeed = 70}, false);
+    arm.move_velocity(0);
+    pros::delay(200);
+    chassis.turnToHeading(0, 1000);
+    
+    chassis.moveToPoint(-39, 47, 2000, {.maxSpeed = 60, .minSpeed = 50}, false);
+    chassis.moveToPoint(-25, 20, 2500, {.forwards = false, .maxSpeed = 60, .minSpeed = 50}, false);
+    chassis.moveToPoint(-65, -25, 2500, {.maxSpeed = 50, .minSpeed = 40}, false);
+    chassis.moveToPoint(-5, 33, 2000, {.forwards = false, .maxSpeed = 60, .minSpeed = 50}, false);
+    chassis.turnToHeading(35, 1000);
+    chassis.moveToPose(-4, 34,  45, 500, {.minSpeed = 50});
+    arm.move_velocity(200);
+    pros::delay(2000);
+}
+
+void ringSideRedNoAlliance(){
+    red = true;
+    blue = false;
+
+    armRotation.set_position(0);
+
+    chassis.setPose(0, 0, 180);
+    chassis.turnToHeading(137, 700, {}, false);
+
     chassis.moveToPose(-11, 45, -180, 1500, {.forwards = false, .maxSpeed = 70, .minSpeed = 50}, false);
     clamp.set_value(true);
     arm.move_velocity(-200);
@@ -1128,7 +1195,7 @@ void ringSideRedElim(){
     
     intakeRaise.set_value(true);
 
-    chassis.moveToPoint(4, -18, 2000, {.maxSpeed = 40, .minSpeed = 40}, false);
+    chassis.moveToPoint(4, -17, 2000, {.maxSpeed = 40, .minSpeed = 40}, false);
     intakeRaise.set_value(false);
     chassis.moveToPoint(11, -20, 1000, {.forwards = false});
     chassis.moveToPoint(5, -20, 1000);
@@ -1142,7 +1209,7 @@ void goalRushRed(){
 
     chassis.setPose(0, 0, -18);
     spinBottom = true;
-    chassis.moveToPoint(-10, 31, 1500,{.minSpeed = 127}, false);
+    chassis.moveToPoint(-10, 32, 1500,{.minSpeed = 127}, false);
     rightDoinker.set_value(true);
     pros::delay(200);
     chassis.moveToPoint(-10, 20, 5000, {.forwards = false, .minSpeed = 100}, false);
@@ -1161,19 +1228,56 @@ void goalRushRed(){
     clamp.set_value(false);
     chassis.moveToPoint(-5, 25, 1500, {.maxSpeed = 50, .minSpeed = 40}, false);
     chassis.turnToHeading(90, 1000);
-    chassis.moveToPoint(-25, 25, 1500, {.forwards = false, .maxSpeed = 50, .minSpeed = 40}, false);
+    chassis.moveToPoint(-27, 26, 1500, {.forwards = false, .maxSpeed = 50, .minSpeed = 40}, false);
     clamp.set_value(true);
     spinTop = true;
     pros::delay(200);
     chassis.turnToHeading(180, 1000, {}, false);
-    chassis.moveToPoint(-15, -10, 1500, {}, false);
-    chassis.moveToPoint(5, -15, 2000, {.maxSpeed = 60, .minSpeed = 60});
+    chassis.moveToPoint(-15, -5, 1500, {}, false);
+    chassis.moveToPoint(10, -15, 2000, {.maxSpeed = 60, .minSpeed = 60});
     pros::delay(500);
     rightDoinker.set_value(true);
     chassis.turnToHeading(0, 2000, {.minSpeed = 70}, false);
     rightDoinker.set_value(false);
     chassis.moveToPoint(-10, 15, 1000, {}, false);
     chassis.turnToHeading(90, 1000, {}, false);
+    spinTop = false;
+}
+
+void goalRushRedArm(){
+    red = true;
+    blue = false;
+
+    chassis.setPose(0, 0, -15.2); //changed to -20 to align with mogo (prev. -18)
+    spinBottom = true;
+    
+    score = true;
+    chassis.moveToPoint(-8.25, 32, 1500,{.minSpeed = 127}, false); // rush forward
+
+    score = false;
+    arm.move_velocity(200);
+    pros::delay(200);
+ 
+    chassis.moveToPoint(-10, 20, 5000, {.forwards = false, .minSpeed = 100}, false);
+    arm.move_velocity(-200);
+    pros::delay(200);
+
+    chassis.turnToHeading(90, 1000);
+    chassis.moveToPoint(-35, 25, 2000, {.forwards = false, .maxSpeed = 50, .minSpeed = 40}, false);
+    clamp.set_value(true);
+    spinTop = true;
+    pros::delay(200);
+    chassis.turnToHeading(40, 1000);
+    chassis.moveToPoint(-22, 34, 1000);
+    chassis.moveToPoint(-25, 5, 1500, {.forwards = false}, false);
+    chassis.turnToHeading(180, 1000, {}, false);
+    chassis.moveToPoint(5, -15, 2000, {.maxSpeed = 60, .minSpeed = 60});
+    pros::delay(200);
+    rightDoinker.set_value(true);
+    chassis.turnToHeading(0, 2000, {.minSpeed = 70}, false);
+    rightDoinker.set_value(false);
+    chassis.moveToPoint(-10, 15, 1000, {}, false);
+    chassis.turnToHeading(60, 1000, {}, false);
     spinTop = false;
 }
 
@@ -1260,14 +1364,15 @@ void autonomous(){
     // goalSideBlue();
     // ringSideBlue();
     // ringSideBlueElim();
-    // ringSideBlueElim5Ring();
     // goalRushBlue();
+    // goalRushBlueArm();
     // soloAWPBlue();
  
-    // goalSideRed();
+    // goalRushRedArm();
     // ringSideRed();
+    // ringSideRedNoAlliance();
     // ringSideRedElim();
-    // ringSideRedElim5Ring();
     // goalRushRed();
+    // goalSideRed();
     // soloAWPRed();
 }
